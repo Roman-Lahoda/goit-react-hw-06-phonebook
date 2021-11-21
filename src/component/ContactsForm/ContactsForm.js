@@ -1,13 +1,10 @@
 import { useState } from "react";
 import s from "./ContactsForm.module.css";
 import shortid from "shortid";
-import { useSelector, useDispatch } from "react-redux";
-import actions from "../../redux/contacts/contacts-actions";
-import { getContacts } from "../../redux/contacts/contacts-selectors";
+import { connect } from "react-redux";
+import { onAddContact } from "../../redux/contacts/contacts-actions";
 
-const ContactsFrom = () => {
-  const contacts = useSelector(getContacts);
-  const dispatch = useDispatch();
+function ContactsFrom({ onAddContact }) {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
 
@@ -27,15 +24,8 @@ const ContactsFrom = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newContact = { id: shortid.generate(), name, number };
-    const sameContact = contacts.find(
-      (contact) => contact.name === newContact.name
-    );
-    if (sameContact) {
-      alert(`${newContact.name} is already in contacts`);
-      return;
-    }
-    dispatch(actions.addContact(newContact));
+    const contact = { id: shortid.generate(), name, number };
+    onAddContact(contact);
     setName("");
     setNumber("");
   };
@@ -73,6 +63,10 @@ const ContactsFrom = () => {
       </button>
     </form>
   );
-};
+}
 
-export default ContactsFrom;
+const mapDispatchToProps = (dispatch) => ({
+  onAddContact: (contact) => dispatch(onAddContact(contact)),
+});
+
+export default connect(null, mapDispatchToProps)(ContactsFrom);
